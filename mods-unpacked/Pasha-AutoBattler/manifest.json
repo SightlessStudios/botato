@@ -25,17 +25,17 @@
 					"ENABLE_AI_VISUALS" : {
 						"type": "boolean",
 						"default": false,
-						"tooltip": "ENABLE_AI_VISUALS_TOOLTIP",
+						"tooltip": "ENABLE_AI_VISUALS_TOOLTIP"
 					},
 					"ENABLE_AI_MARKER" : {
 						"type": "boolean",
 						"default": true,
-						"tooltip": "ENABLE_AI_MARKER_TOOLTIP",
+						"tooltip": "ENABLE_AI_MARKER_TOOLTIP"
 					},
 					"ENABLE_SMOOTHING" : {
 						"type": "boolean",
 						"default": true,
-						"tooltip": "ENABLE_SMOOTHING_TOOLTIP",
+						"tooltip": "ENABLE_SMOOTHING_TOOLTIP"
 					},
 					"SMOOTHING_SPEED" : {
 						"type": "number",
@@ -46,51 +46,51 @@
 					},
 					"ITEM_WEIGHT" : {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 0.5,
 						"tooltip": "ITEM_WEIGHT_TOOLTIP",
-						"format": "%.2f X",
+						"format": "%.2f X"
 					},
 					"PROJECTILE_WEIGHT": {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 2.0,
 						"tooltip": "PROJECTILE_WEIGHT_TOOLTIP",
-                        "format": "%.2f X",
+						"format": "%.2f X"
 					},
 					"TREE_WEIGHT": {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 2.0,
 						"tooltip": "TREE_WEIGHT_TOOLTIP",
-                        "format": "%.2f X",
+						"format": "%.2f X"
 					},
 					"BOSS_WEIGHT": {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 3.0,
 						"tooltip": "BOSS_WEIGHT_TOOLTIP",
-                        "format": "%.2f X",
+						"format": "%.2f X"
 					},
                     "BUMPER_WEIGHT": {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 2.0,
 						"tooltip": "BUMPER_WEIGHT_TOOLTIP",
-                        "format": "%.2f X",
+						"format": "%.2f X"
 					},
                     "EGG_WEIGHT": {
 						"type": "number",
-						"minimum": 0.0,
+						"minimum": -10.0,
 						"maximum": 10.0,
 						"default": 5.0,
 						"tooltip": "EGG_WEIGHT_TOOLTIP",
-                        "format": "%.2f X",
+						"format": "%.2f X"
 					},
                     "BUMPER_DISTANCE": {
 						"type": "number",

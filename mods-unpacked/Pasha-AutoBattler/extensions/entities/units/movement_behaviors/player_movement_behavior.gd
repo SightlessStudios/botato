@@ -1,4 +1,4 @@
-extends "res://entities/units/movement_behaviors/player_movement_behavior.gd"
+	extends "res://entities/units/movement_behaviors/player_movement_behavior.gd"
 
 func get_movement()->Vector2:
 	var options_node = $"/root/AutobattlerOptions"
@@ -30,20 +30,50 @@ func get_movement()->Vector2:
 	var char_name = RunData.get_player_character(0).name.to_lower()
 	
 	var is_soldier = char_name == "character_soldier"
+	var is_streamer = char_name == "character_streamer"
 	var is_bull = char_name == "character_bull"
+	var is_masochist = char_name == "character_masochist"
+	var is_lich = char_name == "character_lich"
+	var is_vampire = char_name == "character_vampire"
+	var is_druid = char_name == "character_druid"
 	
 	var weapon_range = 1_000
 	var bumper_spacing = 50
 	
 	var max_health = float(player.max_stats.health)
 	var current_health = float(player.current_stats.health)
+	var armor = float(player.current_stats.armor)
+	var mitigation = 1.0
+	if armor < 0:
+		mitigation = (15 - 2 * armor) / (15 - armor)
+	else:
+		mitigation = 1 / ( 1 + ( armor / 15 ) )
 	
 	if is_bull:
 		if current_health / max_health < .6:
 			weapon_range = 1000
 		else:
 			weapon_range = 0
-	
+
+	if is_lich:
+		if current_health / max_health > .4375:
+			weapon_range = 0	
+				#	Want to keep the lich healing constantly, which requires them to not be at full HP. Decided on keeping them just under 7/16ths (0.4375) Could possibly lower to 3/8ths (0.375) to stack sharp tooth more, but I think that strategy has hurt me more than helped.
+
+	if is_masochist:
+		if current_health / max_health > .4375:
+			weapon_range = 0
+				#	Want Masochist to constantly take managable amounts of damage. Let's keep them just under 4/8ths (.375) HP, or 7/16ths (0.4375) This would fully take advantage of the regen potion item whenever it appears.	
+
+	if is_vampire:
+		if current_health / max_health > 0.4375:
+			weapon_range = 0
+				#	This seems to work for the other redlining characters. Let's give it a shot.
+
+#	if is_druid:
+#		max_health = max_health + 10
+#			This should trick the AI into still chasing down consumables at full HP for the druid.
+
 	for weapon in player.current_weapons:
 		#var max_range = weapon.stats.max_range
 		var max_range = weapon.current_stats.max_range
@@ -54,8 +84,8 @@ func get_movement()->Vector2:
 	
 	var move_vector = Vector2.ZERO
 	
-	var consumable_weight = (1.0 - (current_health / max_health)) * 2
-	
+#	var consumable_weight = (1.0 - (current_health / max_health) ) * 2
+	var consumable_weight = (1.0 - pow( ( current_health * 10 ) / (  ( max_health * 10 ) + 5 ), 2)) * 2
 	# Eat consumables, weighted by missing hp
 	for consumable in _consumables_container:
 		var consumable_pos = consumable.position
@@ -67,7 +97,7 @@ func get_movement()->Vector2:
 			move_vector = move_vector + to_add
 	
 	# Go towards "items" (gold pickups)
-	var item_weight_squared = item_weight * item_weight
+	var item_weight_squared = item_weight * abs(item_weight)
 	for item in items_container:
 		var item_pos = item.position
 		var item_to_player = item_pos - player.position
@@ -78,7 +108,7 @@ func get_movement()->Vector2:
 			move_vector = move_vector + to_add
 			
 	# Go towards "neutrals" (trees)
-	var tree_weight_squared = tree_weight * tree_weight
+	var tree_weight_squared = tree_weight * abs(tree_weight)
 	for neutral in _entity_spawner.neutrals:
 		var neutral_pos = neutral.position
 		var neutral_to_player = neutral_pos - player.position
@@ -94,7 +124,7 @@ func get_movement()->Vector2:
 			move_vector = move_vector + to_add
 			
 	# Go away from projectiles
-	var projectile_weight_squared = projectile_weight * projectile_weight
+	var projectile_weight_squared = projectile_weight * abs(projectile_weight)
 	for projectile in projectiles_container.get_children():
 		if not projectile._hitbox or not projectile._hitbox.active:
 			continue
@@ -109,7 +139,7 @@ func get_movement()->Vector2:
 		
 		var projectile_pos = projectile.position
 		var projectile_to_player = projectile_pos - player.position
-		var extra_range_squared = extra_range * extra_range
+		var extra_range_squared = extra_range * abs(extra_range)
 		var squared_distance_to_item = projectile_to_player.length_squared() - extra_range_squared
 		if squared_distance_to_item < 0:
 			squared_distance_to_item = .001
@@ -122,7 +152,7 @@ func get_movement()->Vector2:
 	
 	var shooting_anyone = false
 	var must_run_away = false
-	var egg_weight_squared = egg_weight * egg_weight
+	var egg_weight_squared = egg_weight * abs(egg_weight)
 	
 	# Move towards distant enemies, away from nearby ones.  Determined by weapons range.
 	for enemy in _entity_spawner.enemies:
@@ -152,7 +182,7 @@ func get_movement()->Vector2:
 		move_vector = move_vector + to_add
 		
 	# Move towards distant enemies, away from nearby ones.  Determined by weapons range.
-	var boss_weight_squared = boss_weight * boss_weight
+	var boss_weight_squared = boss_weight * abs(boss_weight)
 	for boss in _entity_spawner.bosses:
 		var boss_to_player = boss.position - player.position
 		var squared_distance_to_boss = (boss_to_player).length_squared()
