@@ -36,12 +36,15 @@ func get_movement()->Vector2:
 	var is_lich = char_name == "character_lich"
 	var is_vampire = char_name == "character_vampire"
 	var is_druid = char_name == "character_druid"
+	var is_builder = char_name == "character_builder"
+	var is_pacifist = char_name == "character_pacifist"
 	
 	var weapon_range = 1_000
 	var bumper_spacing = 50
 	
 	var max_health = float(player.max_stats.health)
 	var current_health = float(player.current_stats.health)
+	var low_hp = false
 	var armor = float(player.current_stats.armor)
 	var mitigation = 1.0
 	if armor < 0:
@@ -55,10 +58,26 @@ func get_movement()->Vector2:
 		else:
 			weapon_range = 0
 
+#	if is_lich:
+#		if current_health / max_health > .4375:
+#			weapon_range = 0	
+#				Want to keep the lich healing constantly, which requires them to not be at full HP. Decided on keeping them just under 7/16ths (0.4375) Could possibly lower to 3/8ths (0.375) to stack sharp tooth more, but I think that strategy has hurt me more than helped.
+
 	if is_lich:
-		if current_health / max_health > .4375:
-			weapon_range = 0	
-				#	Want to keep the lich healing constantly, which requires them to not be at full HP. Decided on keeping them just under 7/16ths (0.4375) Could possibly lower to 3/8ths (0.375) to stack sharp tooth more, but I think that strategy has hurt me more than helped.
+		# Turn on Low HP flag when HP <= 7/16
+		if current_health / max_health <= .4375:
+			low_hp = true
+		# Turn off Low HP flag when HP >+15/16
+		if current_health / max_health >= .9375:
+			low_hp = false
+		if not low_hp:
+			weapon_range = 0
+
+	if is_builder:
+		weapon_range = 1250
+
+	if is_pacifist:
+		must_run_away = true
 
 	if is_masochist:
 		if current_health / max_health > .4375:
@@ -275,6 +294,12 @@ func get_movement()->Vector2:
 		
 		bumper_y = bumper_y + bumper_spacing
 		
+# Trying to get soldier to make a tactical retreat, rather than just run away. Implementing a random chance the must run away state gets turned off.
+	if is_soldier:
+		must_run_away = true
+		if must_run_away and randi_range(1, 100) > 1:
+			return Vector2.ZERO
+	
 	if (shooting_anyone and not must_run_away) and is_soldier:
 		return Vector2.ZERO
 		
